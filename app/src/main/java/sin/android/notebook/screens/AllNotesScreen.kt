@@ -1,6 +1,8 @@
 package sin.android.notebook.screens
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -20,16 +22,25 @@ import sin.android.notebook.data.Note
 import sin.android.notebook.ui.theme.NotebookTheme
 
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun NoteView(note: Note, onClicked: () -> Unit) {
+fun NoteView(
+    note: Note,
+    onClicked: () -> Unit,
+    onLongClicked: () -> Unit
+) {
     Card(
         backgroundColor = MaterialTheme.colors.primary,
         modifier = Modifier
             .padding(vertical = 4.dp, horizontal = 8.dp)
-            .selectable(
+            .combinedClickable (
+            onClick = onClicked,
+            onLongClick = onLongClicked
+            )
+        /*    .selectable(
                 selected = true,
                 onClick = onClicked
-            )
+            )*/
     ) {
         Row(
             Modifier
@@ -87,11 +98,15 @@ fun AllNotesView(
                     onNoteSelect(it)
                     onContinueClicked()
                 }
+                val deleteNote={
+                    mainViewModel.deleteNote(it)
+                }
                 NoteView(
                     it,
                     {
                         selectNote()
-                    }
+                    },
+                    deleteNote
                 )
             }
         }

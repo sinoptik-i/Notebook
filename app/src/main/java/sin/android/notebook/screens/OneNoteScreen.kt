@@ -46,7 +46,6 @@ fun DescriptionTextField(description: MutableState<String>) {
 
 
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun OneFullNote(
     note:Note,
@@ -78,10 +77,10 @@ fun OneFullNote(
             modifier = Modifier
                 .size(60.dp)
                 .border(2.dp, MaterialTheme.colors.error, CircleShape)
-                .combinedClickable (
+             /*   .combinedClickable (
                     onClick = uniteContinuations,
                     onLongClick = uniteContinuations
-                        ),
+                        ),*/
 
 
         ) {
