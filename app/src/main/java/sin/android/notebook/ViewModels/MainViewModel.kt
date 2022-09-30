@@ -1,19 +1,21 @@
-package sin.android.notebook
+package sin.android.notebook.ViewModels
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.compose.runtime.MutableState
+import androidx.lifecycle.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import sin.android.notebook.data.Note
 import sin.android.notebook.data.NoteDao
 import sin.android.notebook.data.NoteDatabase
 import sin.android.notebook.data.NoteRepository
 
+
+
+
+
+//class MainViewModel(application: Application) : ViewModel() {
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val noteDao: NoteDao
@@ -39,19 +41,32 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun flowAllNotes() = noteDao.getAllNotes().flowOn(Dispatchers.IO)
 
-    fun tryToAddNote(title: String, description: String): Boolean {
+    fun tryToAddNote(id:Int, title: String, description: String): Boolean {
         if (title != "" && description != "") {
-            addNote(Note(0, title, description))
+            addNote(Note(id, title, description))
             return true
         }
         return false
     }
 
-    fun addNote(note: Note) = noteRepository.addNote(note)
+
+    fun tryToAddNote(note: Note): Boolean {
+        if (note.title != "" && note.description != "") {
+            addNote(note)
+            return true
+        }
+        return false
+    }
 
 
-    private val _allNotes = MutableLiveData<List<Note>>()
-    val allNotes: LiveData<List<Note>> = _allNotes
+    private fun addNote(note: Note) = noteRepository.addNote(note)
+
+    fun deleteNote(note: Note)=noteRepository.deleteNote(note)
+
+
+    private val _allNotes = MutableStateFlow<List<Note>>(emptyList())
+    val allNotes: Flow<List<Note>> = _allNotes
+
 
 
 }
