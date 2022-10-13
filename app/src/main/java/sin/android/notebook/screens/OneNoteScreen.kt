@@ -1,8 +1,6 @@
 package sin.android.notebook.screens
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
@@ -15,6 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import sin.android.notebook.ViewModels.MainViewModel
+import sin.android.notebook.ViewModels.OneNoteVIewModel
 import sin.android.notebook.data.Note
 
 @Composable
@@ -50,7 +49,7 @@ fun DescriptionTextField(description: MutableState<String>) {
 fun OneFullNote(
     note:Note,
     onContinueClicked: () -> Unit,
-    mainViewModel: MainViewModel
+    oneNoteVIewModel: OneNoteVIewModel
     ) {
     var textTitle = remember {
         mutableStateOf(
@@ -69,7 +68,7 @@ fun OneFullNote(
             .padding(8.dp)
     ) {
         val uniteContinuations: () -> Unit = {
-            mainViewModel.tryToAddNote(note.id, textTitle.value, textDescription.value)
+            oneNoteVIewModel.tryToAddNote(note.id, textTitle.value, textDescription.value)
             onContinueClicked()
         }
         IconButton(

@@ -1,3 +1,4 @@
+/*
 package sin.android.notebook.exampleViewModels
 
 import androidx.lifecycle.LiveData
@@ -50,4 +51,4 @@ class ExampleViewModel : ViewModel() {
         screenState.value?.seeAllNotes = !screenState.value?.seeAllNotes!!
     }
 
-}
+}*/

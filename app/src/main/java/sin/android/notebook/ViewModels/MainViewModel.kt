@@ -43,7 +43,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun tryToAddNote(id:Int, title: String, description: String): Boolean {
         if (title != "" && description != "") {
-            addNote(Note(id, title, description))
+            addNote(Note(id, title, description,0))
             return true
         }
         return false

@@ -8,8 +8,8 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import sin.android.notebook.data.Note
-import sin.android.notebook.exampleViewModels.ExampleViewModel
 
+/*
 
 @Composable
 fun StartFunTTN() {
@@ -67,4 +67,4 @@ fun ScreenSawa(
         Text(text = "Ama Sawa, t: ${note.title}, d: ${note.description}")
         Button(onClick = { action() }) {}
     }
-}
+}*/

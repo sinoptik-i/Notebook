@@ -4,7 +4,7 @@ import androidx.compose.runtime.*
 import sin.android.notebook.data.Note
 
 class AppState() {
-    var note: Note by mutableStateOf(Note(0, "", ""))
+    var note: Note by mutableStateOf(Note(0, "", "",0))
 
     var allNotesScreen: Boolean by mutableStateOf(true)
 
