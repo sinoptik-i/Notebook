@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 import sin.android.notebook.ViewModels.AllNotesVIewModel
 import sin.android.notebook.ViewModels.OneNoteVIewModel
 import sin.android.notebook.data.Note
-import sin.android.notebook.exampleScreens.ExTime
 import sin.android.notebook.screens.AllNotesView
 import sin.android.notebook.screens.OneFullNote
 import sin.android.notebook.ui.theme.NotebookTheme
@@ -56,15 +55,15 @@ fun MainFun(
     allNotesVIewModel: AllNotesVIewModel,
     oneNoteVIewModel: OneNoteVIewModel
 ) {
-
+    // if true - table with all notes, false - one note
     var seeAllNotes by rememberSaveable { mutableStateOf(true) }
-    val note = remember { mutableStateOf(Note(0, "", "", 0)) }
+    val note = remember { mutableStateOf(Note(0, "", "", "")) }
     if (seeAllNotes) {
         AllNotesView(
             onNoteSelect = {
                 note.value = it
             },
-            onContinueClicked = { seeAllNotes = false },
+            onAddNewNoteClicked = { seeAllNotes = false },
             allNotesVIewModel = allNotesVIewModel
         )
     } else {

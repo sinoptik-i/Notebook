@@ -12,7 +12,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import sin.android.notebook.ViewModels.MainViewModel
 import sin.android.notebook.ViewModels.OneNoteVIewModel
 import sin.android.notebook.data.Note
 
@@ -44,13 +43,12 @@ fun DescriptionTextField(description: MutableState<String>) {
 }
 
 
-
 @Composable
 fun OneFullNote(
-    note:Note,
+    note: Note,
     onContinueClicked: () -> Unit,
     oneNoteVIewModel: OneNoteVIewModel
-    ) {
+) {
     var textTitle = remember {
         mutableStateOf(
             note.title
@@ -59,7 +57,7 @@ fun OneFullNote(
 //    var textDescription by rememberSaveable { mutableStateOf("") }
     var textDescription = remember {
         mutableStateOf(
-           note.description
+            note.description
         )
     }
     Column(
@@ -76,10 +74,10 @@ fun OneFullNote(
             modifier = Modifier
                 .size(60.dp)
                 .border(2.dp, MaterialTheme.colors.error, CircleShape)
-             /*   .combinedClickable (
-                    onClick = uniteContinuations,
-                    onLongClick = uniteContinuations
-                        ),*/
+            /*   .combinedClickable (
+                   onClick = uniteContinuations,
+                   onLongClick = uniteContinuations
+                       ),*/
 
 
         ) {
@@ -88,6 +86,7 @@ fun OneFullNote(
                 contentDescription = null
             )
         }
+      //  Text(text = "${note.time}")
         TitleTextField(title = textTitle)
         DescriptionTextField(description = textDescription)
     }

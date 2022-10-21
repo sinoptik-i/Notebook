@@ -10,7 +10,7 @@ data class Note(
     @PrimaryKey(autoGenerate = true) val id: Int,
     @ColumnInfo(name = "title") val title: String,
     @ColumnInfo(name = "description") val description: String,
-    @ColumnInfo(name = "time") val time: Long
+    @ColumnInfo(name = "time") val time: String
 )
 
 
