@@ -67,5 +67,8 @@ dependencies {
     implementation "androidx.room:room-ktx:$room_version"
     implementation 'androidx.compose.runtime:runtime-livedata:1.0.0-beta07'
 
+    implementation 'androidx.compose.material3:material3:1.0.0-alpha01'
+
+    implementation "androidx.datastore:datastore-preferences:1.0.0-alpha01"
 
 }

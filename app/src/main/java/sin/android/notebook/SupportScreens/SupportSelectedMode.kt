@@ -1,9 +1,7 @@
-package sin.android.notebook
+package sin.android.notebook.SupportScreens
 
 
 import androidx.compose.runtime.*
-import kotlinx.coroutines.flow.map
-import sin.android.notebook.ViewModels.AllNotesVIewModel
 import sin.android.notebook.data.Note
 
 class SupportSelectedMode(notes: List<Note>) {
@@ -27,6 +25,16 @@ class SupportSelectedMode(notes: List<Note>) {
             changeSelectofNote(note, true)
         } else {
             mapNotes.clear()
+        }
+    }
+
+    fun offSelectedMode() {
+        selectedMode.value = false
+    }
+
+    fun cancelAllSelections(){
+        for(mapNote in mapNotes){
+            changeSelectofNote(mapNote.key,false)
         }
     }
 

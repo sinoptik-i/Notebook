@@ -3,6 +3,8 @@ package sin.android.notebook
 import android.app.Application
 import androidx.compose.runtime.collectAsState
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.mapLatest
 import org.junit.Test
 
 import org.junit.Assert.*
@@ -33,7 +35,7 @@ class ExampleUnitTest {
         val map = listOf(-1, -2, -3, 1, 2, 3, 4).associateWith { it > 0 }
         val map2 = notes.associateWith { false }.toMutableMap()
 
-      //  println(map2)
+        //  println(map2)
 
         for (mapItem in map2) {
             println("${mapItem.key.id}, ${mapItem.value}")
@@ -41,7 +43,7 @@ class ExampleUnitTest {
         val note1 = notes[1]
 
         map2.put(note1, true)
-        val q=map2[note1]
+        val q = map2[note1]
         println(map2[note1])
 
         for (mapItem in map2) {
@@ -51,7 +53,7 @@ class ExampleUnitTest {
     }
 
     @Test
-    suspend fun asdfdsaf(){
+    suspend fun asdfdsaf() {
         val notes: List<Note> = List(4) {
             Note(
                 it,
@@ -60,15 +62,31 @@ class ExampleUnitTest {
                 ""
             )
         }
-        val allNotesVIewModel=AllNotesVIewModel(application = Application())
+        val allNotesVIewModel = AllNotesVIewModel(application = Application())
 
-        lateinit var notesReal:List<Note>
-        lateinit var mapNotes:MutableMap<Note, Boolean>
+        lateinit var notesReal: List<Note>
+        lateinit var mapNotes: MutableMap<Note, Boolean>
 
         allNotesVIewModel.flowAllNotes().collect {
-            mapNotes=it.associateWith { false }.toMutableMap()
+            mapNotes = it.associateWith { false }.toMutableMap()
         }
+    }
 
+    @Test
+    suspend fun testSearch() {
+        val allNotesVIewModel = AllNotesVIewModel(application = Application())
+
+        val allNotes = allNotesVIewModel.flowAllNotes().collect()
+        println(allNotes)
+
+        val foundNotes = allNotesVIewModel
+            .flowAllNotes()
+            .mapLatest { list ->
+                list.filter {
+                    it.id > 2
+                }
+            }
+         //   .collect()
 
 
     }
