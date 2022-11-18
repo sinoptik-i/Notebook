@@ -2,9 +2,12 @@ package sin.android.notebook.ViewModels
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import sin.android.notebook.data.Note
 import sin.android.notebook.data.NoteDao
 import sin.android.notebook.data.NoteDatabase
@@ -16,10 +19,26 @@ class AllNotesVIewModel(application: Application) : AndroidViewModel(application
         get() = NoteDatabase.getDatabase(getApplication()).noteDao()
 
     private val noteRepository = NoteRepository(noteDao, viewModelScope)
+    private val _query = MutableStateFlow<String>("")
 
-    fun flowAllNotes() = noteDao.getAllNotes().flowOn(Dispatchers.IO)
+    fun flowAllNotes() = _query
+        .debounce(1000L)
+        .distinctUntilChanged()
+        .combine(noteDao.getAllNotes()) { query, items ->
+            if (query.isEmpty()) {
+                items
+            } else {
+                items.filter { it.title.contains(query) }
+            }
 
-    fun flowSearchedNotes(searchArgTitle: String){}
+        }.distinctUntilChanged()
+
+
+    fun setSearchArgNotes(searchArgTitle: String) {
+        _query.value = searchArgTitle
+    }
+
+    fun getQuery()=_query.value
 
     fun deleteSelectedNotes(notes: List<Note>) {
         for (note in notes) {
@@ -42,6 +61,4 @@ class AllNotesVIewModel(application: Application) : AndroidViewModel(application
             ""
         )
     }
-
-
 }

@@ -22,7 +22,7 @@ class OneNoteVIewModel(application: Application) : AndroidViewModel(application)
 
 
     fun tryToAddNote(id: Int, title: String, description: String): Boolean {
-        if (title != "" && description != "") {
+        if (title != "") {
             addNote(
                 Note(
                     id, title, description,
@@ -30,8 +30,24 @@ class OneNoteVIewModel(application: Application) : AndroidViewModel(application)
                 )
             )
             return true
+        } else if (description != "") {
+            return false
+        } else {
+            val titleLength = if (description.length > 10) {
+                10
+            } else {
+                description.length
+            }
+            addNote(
+                Note(
+                    id, description.substring(0, titleLength), description,
+                    getNowTime()
+                )
+            )
+            return true
         }
-        return false
+
+
     }
 
     fun getNowTime(): String {

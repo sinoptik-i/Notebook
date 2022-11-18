@@ -1,10 +1,13 @@
 package sin.android.notebook.screens
 
-import androidx.activity.viewModels
-import androidx.compose.animation.AnimatedContentScope.SlideDirection.Companion.End
+import android.app.Application
+import android.content.res.Resources
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -15,12 +18,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import sin.android.notebook.SettingsMaster
-import sin.android.notebook.SupportScreens.SupportScaffoldMenu
 import sin.android.notebook.SupportScreens.SupportSelectedMode
 import sin.android.notebook.ViewModels.AllNotesVIewModel
 import sin.android.notebook.data.Note
@@ -58,17 +59,48 @@ fun MyBottomAppBar(
 fun DriverMenu(
     settingsMaster: SettingsMaster
 ) {
-    // val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    // val settingsMaster = SettingsMaster(context)
+    val state = settingsMaster.isDarkThemeFlow().collectAsState(initial = false)
 
-    Row {
+    Row(
+        modifier = Modifier
+            // .height(40.dp)
+            .fillMaxWidth()
+            // .padding(16.dp)
+            .border(
+                BorderStroke(
+                    2.dp,
+                    if(state.value) {
+                        darkColors().primary
+                    }
+                    else{
+                        lightColors().secondary
+                    }
+                    //Color.LightGray
+                ),
+                shape = RoundedCornerShape(8.dp)
+            ),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
 
-        val state = settingsMaster.isDarkThemeFlow().collectAsState(initial = false)
         //  val chState = settingsMaster.getTheme2()
 
-        Text("Dark theme")
+        Text(
+            modifier = Modifier
+                .padding(horizontal = 8.dp)
+            // .fillMaxHeight()
+            //    .padding(bottom = 8.dp)
+            ,
+            text = "Dark theme"
+        )
+        // Spacer(modifier = Modifier.weight(1f))
         Switch(
+            modifier = Modifier
+                .padding(horizontal = 8.dp)
+
+            //    .padding(bottom = 8.dp)
+            ,
             checked = state.value,
             onCheckedChange = {
                 scope.launch {
@@ -82,12 +114,19 @@ fun DriverMenu(
 
 @Composable
 fun SearchAlertDialog(
-    // allNotesVIewModel: AllNotesVIewModel
-    offSearchAlertDialog: () -> Unit
+    allNotesVIewModel: AllNotesVIewModel,
+    searchState: MutableState<SearchState>
 ) {
-    val searchArgTitle = rememberSaveable { mutableStateOf("") }
+    val searchArgTitle = rememberSaveable {
+        mutableStateOf(allNotesVIewModel.getQuery())
+    }
     AlertDialog(onDismissRequest = {
-        offSearchAlertDialog()
+        //if (searchState.value == SearchState.INPUT) {
+        if (allNotesVIewModel.getQuery() == "") {
+            searchState.value = SearchState.OFF
+        } else {
+            searchState.value = SearchState.RESULTS
+        }
     },
         buttons = {
             Column(
@@ -98,7 +137,8 @@ fun SearchAlertDialog(
                     .padding(horizontal = 8.dp)
                     .align(Alignment.End),
                     onClick = {
-                        //      allNotesVIewModel.flowSearchedNotes(searchArgTitle.value)
+                        allNotesVIewModel.setSearchArgNotes(searchArgTitle.value)
+                        searchState.value = SearchState.RESULTS
                     }) {
                     Text(text = "Search")
                 }
@@ -108,6 +148,46 @@ fun SearchAlertDialog(
 }
 
 
+@Composable
+fun MyTopAppBar(
+    scope: CoroutineScope,
+    scaffoldState: ScaffoldState,
+    allNotesVIewModel: AllNotesVIewModel,
+    searchState: MutableState<SearchState>
+) {
+    TopAppBar {
+        if (searchState.value == SearchState.RESULTS) {
+            IconButton(onClick = {
+                scope.launch {
+                    searchState.value = SearchState.OFF
+                    allNotesVIewModel.setSearchArgNotes("")
+                }
+            }) {
+                Icon(Icons.Filled.Close, "")
+            }
+            Text(
+                modifier = Modifier.weight(1f),
+                text = allNotesVIewModel.getQuery()
+            )
+        } else {
+            IconButton(onClick = {
+                scope.launch {
+                    scaffoldState.drawerState.open()
+                }
+            }) {
+                Icon(Icons.Filled.Menu, "")
+            }
+            Spacer(modifier = Modifier.weight(1f))
+        }
+        IconButton(onClick = {
+            searchState.value = SearchState.INPUT
+        }) {
+            Icon(Icons.Filled.Search, "")
+        }
+    }
+}
+
+enum class SearchState { OFF, INPUT, RESULTS }
 
 @Composable
 fun AllNotesView(
@@ -116,40 +196,57 @@ fun AllNotesView(
     allNotesVIewModel: AllNotesVIewModel, settingsMaster: SettingsMaster
 ) {
 
-    val notes = allNotesVIewModel.getExampleNotes(4)
-    val items by allNotesVIewModel.flowAllNotes().collectAsState(initial = notes)
-   // val allNotes=allNotesVIewModel.flowAllNotes().collect()
-
-
-    val supportSelectedMode by remember { mutableStateOf(SupportSelectedMode(items)) }
-
-    val supportScaffoldMenu by remember { mutableStateOf(SupportScaffoldMenu()) }
+    //var searchState by rememberSaveable { mutableStateOf(false) }
+    var searchState = rememberSaveable { mutableStateOf(SearchState.OFF) }
 
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
 
-    var openSearchAlertDialog by rememberSaveable { mutableStateOf(false) }
+    val notes = allNotesVIewModel.getExampleNotes(4)
+    val items by allNotesVIewModel.flowAllNotes().collectAsState(initial = notes)
 
+    val supportSelectedMode by remember { mutableStateOf(SupportSelectedMode(items ?: notes)) }
 
     Scaffold(
         scaffoldState = scaffoldState,
         topBar = {
-            TopAppBar {
-                IconButton(onClick = {
-                    scope.launch {
-                        scaffoldState.drawerState.open()
+            MyTopAppBar(
+                scope = scope,
+                scaffoldState = scaffoldState,
+                allNotesVIewModel = allNotesVIewModel,
+                searchState = searchState
+            )
+            /*TopAppBar {
+                if (searchState.value == SearchState.RESULTS) {
+                    IconButton(onClick = {
+                        scope.launch {
+                            searchState.value=SearchState.OFF
+                            allNotesVIewModel.setSearchArgNotes("")
+                        }
+                    }) {
+                        Icon(Icons.Filled.Close, "")
                     }
-                    //    supportScaffoldMenu.driverSee.value = true
-                }) {
-                    Icon(Icons.Filled.Menu, "")
+                    Text(
+                        modifier = Modifier.weight(1f),
+                        text = allNotesVIewModel.getQuery()
+                    )
                 }
-                Spacer(modifier = Modifier.weight(1f))
+                else {
+                    IconButton(onClick = {
+                        scope.launch {
+                            scaffoldState.drawerState.open()
+                        }
+                    }) {
+                        Icon(Icons.Filled.Menu, "")
+                    }
+                    Spacer(modifier = Modifier.weight(1f))
+                }
                 IconButton(onClick = {
-                    openSearchAlertDialog = true
+                    searchState.value = SearchState.INPUT
                 }) {
                     Icon(Icons.Filled.Search, "")
                 }
-            }
+            }*/
         },
 
         bottomBar = {
@@ -166,30 +263,17 @@ fun AllNotesView(
 
     ) {
         Column() {
-
-            if (openSearchAlertDialog) {
+            if (searchState.value == SearchState.INPUT) {
                 SearchAlertDialog(
-                    //   allNotesVIewModel = allNotesVIewModel
-                    { openSearchAlertDialog = false }
+                    allNotesVIewModel = allNotesVIewModel,
+                    searchState
                 )
             }
 
 
-/*            Button(
-
-                onClick = {
-                    allNotesVIewModel
-                        .deleteSelectedNotes(supportSelectedMode.getSelectedNotes())
-                }) {
-                Text(text = "delete selected")
-            }
-            Button(onClick = { allNotesVIewModel.add7Notes() }) {
-                Text(text = "add 7 notes")
-            }*/
-
             Box(
                 Modifier.fillMaxSize(),
-                contentAlignment = Alignment.BottomEnd
+                //  contentAlignment = Alignment.BottomEnd
                 //horizontalAlignment = Alignment.End
             ) {
                 val createNewNote = {
@@ -210,8 +294,9 @@ fun AllNotesView(
                 LazyColumn(
                     Modifier
                         .padding(top = 4.dp, bottom = 4.dp)
+                    //  .align(Alignment.)
                 ) {
-                    items(items) {
+                    items(items ?: notes) {
                         var checkState by supportSelectedMode.getCheckState(it)
 //                    var checkState by rememberSaveable { mutableStateOf(false) }
 
@@ -244,8 +329,10 @@ fun AllNotesView(
                 }
 
                 IconButton(
+
                     onClick = createNewNote,
-                    modifier = Modifier
+                    // po4emy blet nelza BottomEnd???
+                    modifier = Modifier.align(Alignment.BottomEnd)
 
                 ) {
                     Icon(
@@ -263,13 +350,25 @@ fun AllNotesView(
     }
 }
 
+
+@Preview
+@Composable
+fun DriverMenuPreview() {
+    DriverMenu(settingsMaster = SettingsMaster(LocalContext.current))
+}
+
+/*
 @Preview(showBackground = true)
 @Composable
 fun AllNotesViewPreview() {
     NotebookTheme {
-        //   AllNotesView({},{},MainViewModel(a))
+        AllNotesView({}, {},
+            AllNotesVIewModel(Application()),
+            SettingsMaster(LocalContext.current)
+        )
     }
 }
+*/
 
 /*@Preview
 @Composable
@@ -280,3 +379,14 @@ fun SearchAlertDialogPreview() {
     )
 }*/
 
+/*            Button(
+
+                onClick = {
+                    allNotesVIewModel
+                        .deleteSelectedNotes(supportSelectedMode.getSelectedNotes())
+                }) {
+                Text(text = "delete selected")
+            }
+            Button(onClick = { allNotesVIewModel.add7Notes() }) {
+                Text(text = "add 7 notes")
+            }*/

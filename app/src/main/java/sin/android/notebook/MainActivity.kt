@@ -2,6 +2,7 @@ package sin.android.notebook
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -12,8 +13,11 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.datastore.preferences.createDataStore
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import sin.android.notebook.ViewModels.AllNotesVIewModel
 import sin.android.notebook.ViewModels.OneNoteVIewModel
@@ -30,6 +34,7 @@ class MainActivity : ComponentActivity() {
     val settingsMaster = SettingsMaster(this)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
 
         setContent {
              // val settingsMaster = SettingsMaster(LocalContext.current)
