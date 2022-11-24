@@ -1,10 +1,7 @@
 package sin.android.notebook.ViewModels
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -12,19 +9,18 @@ import sin.android.notebook.data.Note
 import sin.android.notebook.data.NoteDao
 import sin.android.notebook.data.NoteDatabase
 import sin.android.notebook.data.NoteRepository
+import javax.inject.Inject
 
-class AllNotesVIewModel(application: Application) : AndroidViewModel(application) {
+class AllNotesVIewModel @Inject constructor(
+    private val noteRepository: NoteRepository
+) : ViewModel() {
 
-    private val noteDao: NoteDao
-        get() = NoteDatabase.getDatabase(getApplication()).noteDao()
-
-    private val noteRepository = NoteRepository(noteDao, viewModelScope)
     private val _query = MutableStateFlow<String>("")
 
     fun flowAllNotes() = _query
-        .debounce(1000L)
-        .distinctUntilChanged()
-        .combine(noteDao.getAllNotes()) { query, items ->
+        // .debounce(1000L)
+        // .distinctUntilChanged()
+        .combine(noteRepository.allNotes()) { query, items ->
             if (query.isEmpty()) {
                 items
             } else {
@@ -38,7 +34,7 @@ class AllNotesVIewModel(application: Application) : AndroidViewModel(application
         _query.value = searchArgTitle
     }
 
-    fun getQuery()=_query.value
+    fun getQuery() = _query.value
 
     fun deleteSelectedNotes(notes: List<Note>) {
         for (note in notes) {

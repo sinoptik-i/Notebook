@@ -26,6 +26,7 @@ import sin.android.notebook.SupportScreens.SupportSelectedMode
 import sin.android.notebook.ViewModels.AllNotesVIewModel
 import sin.android.notebook.data.Note
 import sin.android.notebook.ui.theme.NotebookTheme
+import javax.inject.Inject
 import androidx.compose.runtime.mutableStateOf as mutableStateOf
 
 
@@ -56,7 +57,7 @@ fun MyBottomAppBar(
 }
 
 @Composable
-fun DriverMenu(
+fun DriverMenu (
     settingsMaster: SettingsMaster
 ) {
     val scope = rememberCoroutineScope()
@@ -193,7 +194,8 @@ enum class SearchState { OFF, INPUT, RESULTS }
 fun AllNotesView(
     onNoteSelect: (Note) -> Unit,
     onAddNewNoteClicked: () -> Unit,
-    allNotesVIewModel: AllNotesVIewModel, settingsMaster: SettingsMaster
+    allNotesVIewModel: AllNotesVIewModel,
+    settingsMaster: SettingsMaster,
 ) {
 
     //var searchState by rememberSaveable { mutableStateOf(false) }
@@ -216,37 +218,6 @@ fun AllNotesView(
                 allNotesVIewModel = allNotesVIewModel,
                 searchState = searchState
             )
-            /*TopAppBar {
-                if (searchState.value == SearchState.RESULTS) {
-                    IconButton(onClick = {
-                        scope.launch {
-                            searchState.value=SearchState.OFF
-                            allNotesVIewModel.setSearchArgNotes("")
-                        }
-                    }) {
-                        Icon(Icons.Filled.Close, "")
-                    }
-                    Text(
-                        modifier = Modifier.weight(1f),
-                        text = allNotesVIewModel.getQuery()
-                    )
-                }
-                else {
-                    IconButton(onClick = {
-                        scope.launch {
-                            scaffoldState.drawerState.open()
-                        }
-                    }) {
-                        Icon(Icons.Filled.Menu, "")
-                    }
-                    Spacer(modifier = Modifier.weight(1f))
-                }
-                IconButton(onClick = {
-                    searchState.value = SearchState.INPUT
-                }) {
-                    Icon(Icons.Filled.Search, "")
-                }
-            }*/
         },
 
         bottomBar = {
@@ -354,7 +325,7 @@ fun AllNotesView(
 @Preview
 @Composable
 fun DriverMenuPreview() {
-    DriverMenu(settingsMaster = SettingsMaster(LocalContext.current))
+//    DriverMenu(settingsMaster = SettingsMaster(LocalContext.current))
 }
 
 /*

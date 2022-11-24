@@ -2,6 +2,7 @@ package sin.android.notebook.ViewModels
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import sin.android.notebook.data.Note
 import sin.android.notebook.data.NoteDao
@@ -9,17 +10,13 @@ import sin.android.notebook.data.NoteDatabase
 import sin.android.notebook.data.NoteRepository
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
 
-class OneNoteVIewModel(application: Application) : AndroidViewModel(application) {
-
-    private val noteDao: NoteDao
-        get() = NoteDatabase.getDatabase(getApplication()).noteDao()
-
-
-    private val noteRepository = NoteRepository(noteDao, viewModelScope)
+class OneNoteVIewModel @Inject constructor(
+    private val noteRepository: NoteRepository
+) : ViewModel() {
 
     private fun addNote(note: Note) = noteRepository.addNote(note)
-
 
     fun tryToAddNote(id: Int, title: String, description: String): Boolean {
         if (title != "") {
@@ -30,7 +27,7 @@ class OneNoteVIewModel(application: Application) : AndroidViewModel(application)
                 )
             )
             return true
-        } else if (description != "") {
+        } else if (description == "") {
             return false
         } else {
             val titleLength = if (description.length > 10) {

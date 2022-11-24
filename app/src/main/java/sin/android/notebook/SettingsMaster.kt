@@ -1,6 +1,7 @@
 package sin.android.notebook
 
 import android.content.Context
+import androidx.datastore.DataStore
 import androidx.datastore.preferences.Preferences
 import androidx.datastore.preferences.createDataStore
 import androidx.datastore.preferences.preferencesKey
@@ -11,10 +12,13 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class SettingsMaster(context: Context) {
-
-    private val dataStore = context.createDataStore("notebook_settings")
+@Singleton
+class SettingsMaster @Inject constructor(
+    private val dataStore: DataStore<Preferences>
+) {
 
     private val DARK_THEME = preferencesKey<Boolean>("dark_Theme")
 
